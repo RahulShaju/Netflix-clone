@@ -1,8 +1,16 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import { checkFormValidation } from '../utils/validate'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../utils/firebaseConfig';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import LoggedInHeader from './LoggedInHeader';
+
 
 const Login = () => {
+  const navigate = useNavigate()
+ 
   const [isSigninForm, setIsSigninForm] = useState(true)
   const [errorMessage,setErrorMessage] = useState(null)
   const email = useRef(null)
@@ -14,13 +22,49 @@ const Login = () => {
   const handleButtonSubmit = () =>{
   console.log("email",email.current.value)
   console.log("password",password.current.value)
-  const errorMessage = checkFormValidation(email.current.value,password.current.value)
-   setErrorMessage(errorMessage)
+  const errMessage = checkFormValidation(email.current.value,password.current.value)
+   setErrorMessage(errMessage)
+   if(errMessage) return
+   
+   if(!isSigninForm){
+createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    // Signed in 
+    
+    const user = userCredential.user;
+    console.log(user)
+    setIsSigninForm(true)
+    navigate('/browse')
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errMessage = error.message;
+    setErrorMessage("User already exists")
+    // ..
+  });
+   }
+   else{
+    // sign in logic
+    signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    console.log("signin",user)
+    navigate('/browse')
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errMessage = error.message;
+    setErrorMessage("User not found")
+  });
+   }
   }
   return (
     <div className='relative h-screen'>
        
-        <Header/>
+      <Header/> 
      
       <div className='absolute'>
         <img className='' src="https://assets.nflxext.com/ffe/siteui/vlv3/855ed6e2-d9f1-4afd-90da-96023ec747c3/85eb5b91-25ed-4965-ace9-ba8e4a0ead8d/IN-en-20230828-popsignuptwoweeks-perspective_alpha_website_large.jpg" alt="bg" />
