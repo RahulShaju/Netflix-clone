@@ -1,14 +1,25 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+
 import LoggedInHeader from './LoggedInHeader'
+import useNowplayingMovies from '../hooks/useNowPlayingMovies'
+import MainContainer from './MainContainer'
+import SecondaryContainer from './SecondaryContainer'
+
 
 const Browse = () => {
-  
+  useNowplayingMovies()
   return (
-    <div className='bg-black text-white'>
+    <div>
+<div className='fixed z-20 bg-black bg-opacity-10 text-white'>
      <LoggedInHeader/>
-      Browse
+      
+      {/* <SecondaryContainer/> */}
     </div>
+    <div >
+    <MainContainer/>
+    </div>
+    </div>
+    
   )
 }
 
